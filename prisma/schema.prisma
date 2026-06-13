@@ -1,0 +1,91 @@
+// Prisma schema — Mondial 26 Pronostics
+// Toutes les dates sont stockées en UTC.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  PLAYER
+}
+
+enum Stage {
+  GROUP
+  R32
+  R16
+  QF
+  SF
+  THIRD
+  FINAL
+}
+
+model User {
+  id           String       @id @default(cuid())
+  username     String       @unique
+  passwordHash String
+  role         Role         @default(PLAYER)
+  // Ajustement manuel de points par l'admin (bonus/malus), ajouté au total calculé.
+  pointsAdjustment Int      @default(0)
+  createdAt    DateTime     @default(now())
+  predictions  Prediction[]
+}
+
+model Match {
+  id String @id @default(cuid())
+
+  // Clé de jointure stable vers la source openfootball (index dans le tableau "matches").
+  // Insensible aux renommages d'équipes et à l'ajout des scores côté source.
+  sourceIndex Int    @unique
+  sourceTeam1 String // nom d'équipe EXACTEMENT comme dans la source (ex: "Mexico", "2A", "W101")
+  sourceTeam2 String
+  sourceDate  String // "YYYY-MM-DD" tel que fourni par la source
+
+  // Champs d'affichage, éditables par l'admin (renommer un "W101" en vrai pays, etc.)
+  teamA String
+  teamB String
+  flagA String @default("🏳️")
+  flagB String @default("🏳️")
+
+  kickoff DateTime // instant UTC du coup d'envoi (verrou des pronostics)
+  stage   Stage
+  group   String? // ex: "Group A" (phase de groupes uniquement)
+
+  // Résultat
+  scoreA         Int?
+  scoreB         Int?
+  finished       Boolean @default(false)
+  manualOverride Boolean @default(false) // si true, le cron ne touche plus au score
+
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  predictions Prediction[]
+
+  @@index([kickoff])
+  @@index([stage])
+}
+
+model Prediction {
+  id      String @id @default(cuid())
+  userId  String
+  matchId String
+
+  predA Int
+  predB Int
+
+  points Int @default(0) // recalculé à chaque changement de résultat (idempotent)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  match Match @relation(fields: [matchId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, matchId]) // un seul pronostic par joueur et par match
+  @@index([matchId])
+}

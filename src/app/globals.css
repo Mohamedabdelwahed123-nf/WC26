@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Identité Mondial 26 — thème SOMBRE « glass » par-dessus le shader animé */
+    --royal: 230 84% 56%; /* accent bleu */
+
+    --background: 230 30% 6%; /* presque noir (repli sous le shader) */
+    --foreground: 0 0% 98%; /* texte clair */
+
+    --card: 230 28% 9%; /* cartes sombres (rendues translucides + flou) */
+    --card-foreground: 0 0% 98%;
+
+    --primary: 16 100% 56%; /* orange #FF5A1F (actions) */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 230 18% 16%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 230 18% 16%;
+    --muted-foreground: 220 14% 68%;
+
+    --accent: 230 18% 20%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 230 16% 22%;
+    --input: 230 16% 24%;
+    --ring: 16 100% 56%;
+
+    --radius: 0.75rem;
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+    --font-display-stack: var(--font-anton), Impact, "Arial Narrow", sans-serif;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    /* Repli sombre sous le shader animé (qui couvre tout le viewport) */
+    background-color: hsl(var(--background));
+  }
+
+  body {
+    @apply font-sans antialiased;
+    color: hsl(var(--foreground));
+    background: transparent;
+    min-height: 100dvh;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display-stack);
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+  }
+}
+
+@layer components {
+  /* Texte d'accent — dégradé orange (lisible sur blanc) */
+  .text-gold-metal {
+    background: linear-gradient(180deg, #ff7a3d 0%, #ff5a1f 50%, #d23e00 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Logo typographique : « 2 » empilé sur « 6 », dégradé tri-couleur */
+  .logo-26 {
+    font-family: var(--font-display-stack);
+    line-height: 0.78;
+    background: linear-gradient(160deg, #ff5a1f 0%, #ffd23d 50%, #ffffff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Chiffres « 2026 » détourés (contour) — variante claire (sur fond bleu) */
+  .num-outline {
+    font-family: var(--font-display-stack);
+    line-height: 0.8;
+    color: transparent;
+    -webkit-text-stroke: 2px rgba(255, 255, 255, 0.22);
+  }
+  /* Variante sombre (sur cartes blanches) */
+  .num-outline-dark {
+    -webkit-text-stroke: 2px rgba(11, 21, 51, 0.1);
+  }
+}
+
+/* Masquer les flèches des inputs number */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
