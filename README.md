@@ -139,20 +139,24 @@ npm run db:seed
 ```json
 {
   "crons": [
-    { "path": "/api/cron/fetch-results", "schedule": "*/30 * * 6,7 *" }
+    { "path": "/api/cron/fetch-results", "schedule": "0 12 * * *" }
   ]
 }
 ```
 
-- Toutes les **30 min**, uniquement en **juin et juillet**.
+- **Une fois par jour** (12:00 UTC) — c'est la limite du plan **Hobby** de Vercel ; une
+  fréquence plus élevée (ex. toutes les 30 min) est **refusée au déploiement** sur Hobby.
 - L'endpoint vérifie en plus la fenêtre exacte **11 juin → 19 juillet 2026** et ne fait rien en dehors.
 - Vercel envoie automatiquement l'en-tête `Authorization: Bearer <CRON_SECRET>` ; l'endpoint
   le vérifie. Définis donc `CRON_SECRET` dans les variables Vercel.
 
-> ⚠️ **Plan Vercel Hobby** : les crons sont limités à **une exécution par jour**. Pour une
-> fréquence de 30 min il faut le plan **Pro**, ou bien utiliser un cron externe
-> (ex. [cron-job.org](https://cron-job.org)) qui appelle l'URL avec l'en-tête
-> `Authorization: Bearer <CRON_SECRET>`. La saisie manuelle reste toujours disponible.
+> ⚠️ **Plan Vercel Hobby** : les crons ne peuvent tourner qu'**une fois par jour** (d'où
+> `0 12 * * *`). Pour des mises à jour plus fréquentes (ex. toutes les 30 min pendant les
+> matchs), deux options : passer au plan **Pro**, ou utiliser un **cron externe gratuit**
+> (ex. [cron-job.org](https://cron-job.org)) qui appelle
+> `https://<ton-app>.vercel.app/api/cron/fetch-results` toutes les 30 min avec l'en-tête
+> `Authorization: Bearer <CRON_SECRET>`. La saisie manuelle des scores dans `/admin` reste
+> toujours disponible.
 
 ### Robustesse du cron
 
