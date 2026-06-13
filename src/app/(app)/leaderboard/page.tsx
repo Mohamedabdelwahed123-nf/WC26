@@ -18,10 +18,12 @@ function StandingsTable({
   rows: StandingRow[];
   meId: string;
 }) {
-  if (rows.every((r) => r.played === 0)) {
+  // Le classement s'affiche toujours : on montre la grille des joueurs inscrits
+  // (à 0 pt au départ), puis les points se remplissent à mesure des résultats.
+  if (rows.length === 0) {
     return (
       <p className="py-10 text-center text-sm text-muted-foreground">
-        Pas encore de résultats pour ce classement.
+        Aucun joueur inscrit pour le moment.
       </p>
     );
   }
